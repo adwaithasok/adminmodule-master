@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin</title>
+  <link rel="stylesheet" href="style.css"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Arial', sans-serif;
+      display: flex;
+      background-color: #f4f4f4; /* Set a light background color */
+    }
+
+    nav {
+      width: 250px;
+      background-color: #333;
+      color: #fff;
+      padding: 10px;
+      transition: background-color 0.3s ease; /* Add transition for a smoother color change */
+    }
+
+    nav:hover {
+      background-color: #555; /* Change background color on hover */
+    }
+
+    ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    li {
+      margin-bottom: 10px;
+    }
+
+    a {
+      text-decoration: none;
+      color: #fff;
+      display: flex;
+      align-items: center;
+    }
+
+    .logo img {
+      width: 30px;
+      margin-right: 10px;
+    }
+
+    .container {
+      flex-grow: 1;
+      padding: 20px;
+      position: relative; /* Added position relative */
+    }
+
+    .admin-box {
+      background-color: #555;
+      padding: 10px;
+      margin-bottom: 20px;
+      border-radius: 8px;
+    }
+
+    .admin-box img {
+      width: 50px;
+      border-radius: 50%;
+    }
+
+    .admin-box span {
+      margin-left: 10px;
+    }
+
+    .content {
+      display: none;
+      margin-top: 20px;
+    }
+
+    .content h2 {
+      color: #333;
+    }
+
+    /* Added the style for the iframe */
+    iframe {
+      width: calc(100% - 250px); /* Adjust the width based on your needs */
+      height: 100%;
+      border: none;
+      position: absolute;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      left: 250px; /* Set the left offset to the width of the nav */
+      
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <nav>
+      <ul>
+        <li class="admin-box">
+          <a href="#" class="logo">
+            <img src='admin_logo.jpg' alt="">
+            <span class="nav-item">Admin</span>
+          </a>
+        </li>
+        <li><a href="#" onclick="showContent('managestudent')">
+          <i class="fas fa-user"></i>
+          <span class="nav-item">Manage Student</span>
+        </a></li>
+        <li><a href="#" onclick="showContent('assignwork')">
+          <i class="fas fa-tasks"></i>
+          <span class="nav-item">Assign Work</span>
+        </a></li>
+        <li><a href="#" onclick="showContent('viewdownload')">
+          <i class="fas fa-file"></i>
+          <span class="nav-item">View and Download</span>
+        </a></li>
+        <li><a href="#" class="Logout">
+          <i class="fas fa-sign-out-alt"></i>
+          <span class="nav-item">Logout</span>
+        </a></li>
+      </ul>
+    </nav>
+
+    <div id="managestudent" class="content">
+      <!-- <h2>Manage Student</h2> -->
+      <!-- Updated the iframe source to manageemployee.html -->
+      <iframe id="manageEmployeeFrame" src="manage_student.html" frameborder="0"></iframe>
+    </div>
+
+    <div id="assignwork" class="content">
+      <!-- <h2>Assign Work</h2> -->
+      <iframe id="assignWork" src="assign_work.html" frameborder="0"></iframe>
+    </div>
+
+    <div id="viewdownload" class="content">
+      <!-- <h2>View and Download</h2> -->
+      <!-- <p>Content for viewing and downloading goes here.</p> -->
+      <iframe id="viewDownload" src="admin_viewdownload.html" frameborder="0"></iframe>
+
+    </div>
+  </div>
+
+  <script>
+    function showContent(contentId) {
+      const contentElements = document.querySelectorAll('.content');
+      contentElements.forEach(element => {
+        element.style.display = 'none';
+      });
+
+      const selectedContent = document.getElementById(contentId);
+      selectedContent.style.display = 'block';
+
+      // Dynamically update the iframe source based on the contentId
+      const iframe = document.getElementById('manageEmployeeFrame');
+      iframe.src = contentId === 'managestudent' ? 'manage_student.html' : '';
+
+      const iframe2 = document.getElementById('assignWork');
+      iframe2.src = contentId === 'assignwork' ? 'assign_work.html' : '';
+
+      const iframe3 = document.getElementById('viewDownload');
+      iframe3.src = contentId === 'viewdownload' ? 'admin_viewdownload.html' : '';
+    }
+  </script>
+</body>
+</html>

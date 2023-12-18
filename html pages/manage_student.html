@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Manage Students</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Arial', sans-serif;
+    }
+
+    table {
+      border-collapse: collapse;
+      width: 80%;
+      margin: 20px auto;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    table,
+    th,
+    td {
+      border: 1px solid #ddd;
+    }
+
+    th,
+    td {
+      padding: 12px;
+      text-align: left;
+    }
+
+    th {
+      background-color: #17273b;
+      color: white;
+    }
+
+    .edit-btn,
+    .delete-btn {
+      background-color: #17273b;
+      color: white;
+      padding: 10px 15px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      margin-bottom: 10px;
+    }
+
+    .edit-btn:hover,
+    .delete-btn:hover {
+      background-color: #dbae1a;
+    }
+
+    .btn-container {
+      text-align: right;
+      margin-right: 20px;
+    }
+
+    .close-icon:hover {
+      color: #ff0000;
+    }
+
+    .close-icon {
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      font-size: 24px;
+      /* Larger font size for better visibility */
+      cursor: pointer;
+      color: #333;
+    }
+
+    .checkbox-col {
+      display: none;
+    }
+
+    .checkbox-col input {
+      margin-left: 10px;
+    }
+
+    .add-btn {
+      background-color: #17273b;
+      color: white;
+      padding: 10px 15px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      margin-bottom: 10px;
+    }
+
+    .add-btn:hover {
+      background-color: #dbae1a;
+    }
+
+    /* Additional style for the edit-popup */
+    #edit-popup {
+      display: none;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      padding: 30px;
+      /* Increased padding for a larger popup */
+      background-color: #ffffff;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+      border-radius: 10px;
+      z-index: 1000;
+      max-width: 600px;
+      /* Set a maximum width for better readability */
+      width: 90%;
+      /* Adjust the width as needed */
+    }
+
+    #popup-container {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .padding-class {
+      margin: 10px;
+      padding-top: 15px;
+      padding-bottom: 15px;
+
+    }
+
+    .btn-class {
+      padding: 10px;
+      background-color: #17273b;
+      color: #ddd;
+
+
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="btn-container">
+    <button class="add-btn" onclick="addStudent()">+</button>
+  </div>
+
+  <table id="student-table">
+    <thead>
+      <tr>
+        <th>Serial Number</th>
+        <th>Name</th>
+        <th>Register Number</th>
+        <th>DOB</th>
+        <th>Department</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      <!-- Data will be dynamically added here -->
+    </tbody>
+  </table>
+
+  <!-- Edit Popup -->
+  <!-- Edit Popup -->
+  <!-- Edit Popup -->
+  <div id="edit-popup">
+    <div id='popup-container'>
+      <span class="close-icon" onclick="closeEditPopup()">&times;</span>
+      <h2>Edit Student</h2>
+      <label>Name:</label> <input type="text" class="padding-class" id="edit-name"><br>
+      <label>Register Number:</label> <input class="padding-class" type="text" id="edit-register-number"><br>
+      <label>DOB:</label> <input type="text" class="padding-class" id="edit-dob"><br>
+      <label>Department:</label> <input type="text" class="padding-class" id="edit-department"><br>
+      <button class="btn-class" onclick="saveChanges()">Save Changes</button>
+    </div>
+  </div>
+
+
+
+  <script>
+    function addStudent() {
+      // Implement logic to add a new student
+      window.location.href = 'register_student.html';
+    }
+    function closeEditPopup() {
+      console.log("sdfghj");
+      document.getElementById('edit-popup').style.display = 'none';
+    }
+
+
+
+    function editStudent(serialNumber, name, dob, department) {
+      console.log(dob);
+      // Fetch the student data based on the serialNumber
+      const editedStudent = getStudentData(serialNumber, name, dob, department);
+
+      // Populate the edit-popup with the student data
+      document.getElementById('edit-name').value = editedStudent.name;
+      document.getElementById('edit-register-number').value = editedStudent.register_number;
+      document.getElementById('edit-dob').value = editedStudent.dob;
+      document.getElementById('edit-department').value = editedStudent.department;
+
+      // Display the edit-popup
+      document.getElementById('edit-popup').style.display = 'block';
+    }
+    function deleteStudent(deleteButton) {
+      // Get the register_number from the data-register-number attribute
+      const registerNumber = deleteButton.getAttribute('data-register-number');
+
+      // Confirm with the user before deleting
+      if (confirm(`Are you sure you want to delete the student with Register Number ${registerNumber}?`)) {
+        // Make the fetch request to the /delete_user endpoint
+        fetch('http://127.0.0.1:5000/delete_user', {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ register_number: registerNumber }),
+        })
+          .then(response => {
+            if (!response.ok) {
+              throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+            return response.json();
+          })
+          .then(data => {
+            console.log('Success:', data);
+            alert('Deleted Successfully');
+
+            // Assuming you want to refresh the table data after deleting
+            refreshTableData();
+          })
+          .catch(error => {
+            console.error('Error:', error);
+            // Handle errors as needed
+          });
+      }
+    }
+
+
+    function saveChanges() {
+      // Get the edited values from the input fields
+      const editedName = document.getElementById('edit-name').value;
+      const editedRegisterNumber = document.getElementById('edit-register-number').value;
+      const editedDOB = document.getElementById('edit-dob').value;
+      const editedDepartment = document.getElementById('edit-department').value;
+
+      // Prepare the data to send in the request body
+      const requestData = {
+        register_number: editedRegisterNumber,
+        updated_data: {
+          name: editedName,
+          dob: editedDOB,
+          department: editedDepartment
+        }
+      };
+
+      // Make the fetch request to the /edit_user endpoint
+      fetch('http://127.0.0.1:5000/edit_user', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(requestData),
+      })
+        .then(response => {
+          if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+          }
+          return response.json();
+        })
+        .then(data => {
+          console.log('Success:', data);
+          alert('Updated Successfully');
+
+          // Assuming you want to close the edit popup after a successful edit
+          document.getElementById('edit-popup').style.display = 'none';
+          // You may also want to refresh the table data after editing
+          refreshTableData();
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          // Handle errors as needed
+        });
+    }
+
+    // Function to refresh the table data after editing
+    function refreshTableData() {
+      // Fetch the updated user data and repopulate the table
+      fetch('http://127.0.0.1:5000/get_all_users')
+        .then(response => response.json())
+        .then(data => populateTable(data.users_data))
+        .catch(error => console.error('Error fetching data:', error));
+    }
+
+
+    fetch('http://127.0.0.1:5000/get_all_users')
+      .then(response => response.json())
+      .then(data => populateTable(data.users_data)) // Access the 'users_data' property
+      .catch(error => console.error('Error fetching data:', error));
+
+    function populateTable(usersData) {
+      // Get the table body element
+      const tbody = document.querySelector('#student-table tbody');
+
+      // Clear existing table rows
+      tbody.innerHTML = '';
+
+      // Check if usersData is an array
+      if (Array.isArray(usersData)) {
+        // Iterate over the usersData and add rows to the table
+        usersData.forEach(user => {
+          const row = document.createElement('tr');
+          row.innerHTML = `
+          <td>.</td>
+          <td>${user.name}</td>
+          <td>${user.register_number}</td>
+          <td>${user.dob}</td>
+          <td>${user.department}</td>
+          <td>
+            <button class="edit-btn" onclick="editStudent('${user.register_number}', '${user.name}','${user.dob}','${user.department}')">Edit</button>
+            <!-- Add the "data-register-number" attribute to store the register_number -->
+            <button class="delete-btn" data-register-number="${user.register_number}" onclick="deleteStudent(this)">Delete</button>
+
+          </td>
+        `;
+          tbody.appendChild(row);
+        });
+      } else {
+        console.error('Data received from the API does not contain an array:', usersData);
+      }
+    }
+
+    // Replace this function with your actual implementation to get student data
+    function getStudentData(serialNumber, name, dob, department) {
+      console.log(dob);
+      // Example data, replace with actual logic to get data from your system
+      return {
+        name: name,
+        register_number: serialNumber,
+        dob: dob,
+        department: department
+      };
+    }
+  </script>
+</body>
+
+</html>

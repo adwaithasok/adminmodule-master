@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Student Registration</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+
+        header {
+            background-color: #333;
+            color: white;
+            padding: 1em;
+            text-align: center;
+        }
+
+        main {
+            max-width: 600px;
+            margin: 20px auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        form {
+            display: grid;
+            gap: 15px;
+        }
+
+        input,
+        select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        input[type="file"] {
+            padding: 6px;
+        }
+
+        button {
+
+            background-color: #333;
+            color: white;
+            padding: 10px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+    </style>
+    <script>
+        function registrationForm() {
+            console.log('adwaith');
+
+
+            // Get the form element
+            const registrationForm = document.querySelector('form');
+
+            // Add a submit event listener to the form
+            // Prevent the default form submission
+            event.preventDefault();
+
+            // Create an object with the form data
+            const formData = {
+                department: document.getElementById('department').value,
+                register_number: document.getElementById('registration_number').value,
+                name: document.getElementById('name').value,
+                dob: document.getElementById('date_of_birth').value
+            };
+
+            // Make a POST request to your Flask API endpoint
+            fetch('http://127.0.0.1:5000/register', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(formData)
+            })
+                .then(response => {
+                    if (response.ok) {
+                        console.log('ok');
+                        alert('Registration successful!');
+
+                        window.location.href = 'manage_student.html';
+
+                    } else {
+                        console.log("HTTP error " + response.status);
+                        alert('Error occurred. Please try again.');
+
+                    }
+
+                })
+                // .then(response => response.json())
+                // .then(data => {
+                //     // Handle the response from the server
+                //     console.log(data);
+
+                //     // Display the response in a popup (alert)
+                //     alert(JSON.stringify(data));
+
+                //     // You can add additional logic here if needed
+                // })
+                .catch(error => {
+                    console.error('Error:', error);
+
+                    // Handle errors, display an error message, etc.
+                    alert('Error occurred. Please try again.');
+                });
+        }
+    </script>
+
+
+</head>
+
+<body>
+    <header>
+        <h1> Student Registration</h1>
+    </header>
+    <main>
+        <form onsubmit="registrationForm(event)">
+            <label for="registration_number">Registration Number:</label>
+            <input type="text" id="registration_number" name="registration_number" required>
+
+            <label for="name">Name:</label>
+            <input type="text" id="name" name="name" required>
+
+            <label for="date_of_birth">Date of Birth:</label>
+            <input type="date" id="date_of_birth" name="date_of_birth" required>
+
+            <label for="department">Department:</label>
+            <input type="text" id="department" name="department" required>
+
+            <button type="submit">Submit</button>
+        </form>
+
+    </main>
+</body>
+
+</html>

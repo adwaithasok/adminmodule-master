@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Work Details</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+
+        header {
+            background-color: #333;
+            color: white;
+            padding: 1em;
+            text-align: center;
+        }
+
+        main {
+            padding: 20px;
+        }
+
+        .work-details {
+            background-color: #fff;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .upload-section {
+            margin-top: 20px;
+        }
+
+        .status-section {
+            margin-top: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+
+        input[type="file"] {
+            margin-bottom: 16px;
+        }
+
+        .status-text {
+            padding: 8px;
+            background-color: #eee;
+            border-radius: 4px;
+        }
+
+        button {
+            padding: 10px 20px;
+            background-color: #333;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Work Details</h1>
+    </header>
+    <main>
+        <!-- First Work Detail -->
+        <div class="work-details">
+            <label for="work-title-1">Work Title:</label>
+            <p id="work-title-1">Assignment XYZ</p>
+
+            <div class="upload-section">
+                <label for="file-upload-1">Upload File:</label>
+                <input type="file" id="file-upload-1">
+
+                <button onclick="uploadFile(1)">Upload</button>
+            </div>
+
+            <div class="status-section">
+                <label>Status:</label>
+                <div class="status-text">Approved</div>
+            </div>
+        </div>
+
+        <!-- Second Work Detail -->
+        <div class="work-details">
+            <label for="work-title-2">Work Title:</label>
+            <p id="work-title-2">Project ABC</p>
+
+            <div class="upload-section">
+                <label for="file-upload-2">Upload File:</label>
+                <input type="file" id="file-upload-2">
+
+                <button onclick="uploadFile(2)">Upload</button>
+            </div>
+
+            <div class="status-section">
+                <label>Status:</label>
+                <div class="status-text">Pending</div>
+            </div>
+        </div>
+        <!-- Add more work details as needed -->
+    </main>
+    <script>
+        function uploadFile(workNumber) {
+            // Implement file upload logic here
+            alert(`File for Work ${workNumber} uploaded!`);
+        }
+    </script>
+</body>
+</html>

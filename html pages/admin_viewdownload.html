@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>View and Download</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Arial', sans-serif;
+      display: flex;
+      background-color: #f4f4f4;
+      /* Set a light background color */
+    }
+
+
+
+
+    nav:hover {
+      background-color: #555;
+      /* Change background color on hover */
+    }
+
+    ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    li {
+      margin-bottom: 10px;
+    }
+
+    a {
+      text-decoration: none;
+      color: #fff;
+      display: flex;
+      align-items: center;
+    }
+
+    .logo img {
+      width: 30px;
+      margin-right: 10px;
+    }
+
+    .container {
+      flex-grow: 1;
+      padding: 20px;
+      position: relative;
+      /* Added position relative */
+    }
+
+    .content {
+      display: flex;
+      justify-content: center;
+      /* Center align content */
+      align-items: flex-start;
+      /* Align content to the top */
+    }
+
+    .work-details {
+      width: 80%;
+    }
+
+    .work-list {
+      border-collapse: collapse;
+      width: 100%;
+      margin-top: 20px;
+      background-color: #fff;
+      /* box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); */
+      border-radius: 8px;
+      overflow: hidden;
+      text-align: center;
+    }
+
+    .work-list th,
+    .work-list td {
+      border: 1px solid #ddd;
+      padding: 12px;
+    }
+
+    .work-list th {
+      background-color: #17273b;
+      color: #fff;
+    }
+
+    .download-button {
+      background-color: #17273b;
+      color: #fff;
+      padding: 10px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 16px;
+      transition: background-color 0.3s;
+    }
+
+    .download-button:hover {
+      background-color: #dbae1a;
+    }
+
+
+
+
+
+    #dashboard-popup {
+      display: none;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      padding: 20px;
+      background-color: #fff;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      z-index: 2;
+      border-radius: 8px;
+    }
+
+    #close-dashboard {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      font-size: 24px;
+      color: #888;
+      cursor: pointer;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <nav>
+      <ul>
+        <li><a href="#" onclick="showContent('workdetails')">
+            <i class="fas fa-file"></i>
+          </a></li>
+      </ul>
+    </nav>
+
+    <div id="workdetails" class="content">
+      <div class="work-details">
+        <table class="work-list" id="userTable">
+          <thead>
+            <tr>
+              <th>Registration Number</th>
+              <th>Name</th>
+              <th>Assigned Work</th>
+              <th>Status</th>
+              <th>Duplication attempted</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- Table content will be dynamically populated here -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div id="dashboard-popup">
+      <span id="close-dashboard" onclick="closeDashboardPopup()">&times;</span>
+      <h2>Dashboard</h2>
+      <p id="isDuplicateHappend">Efficiency Chart</p>
+    </div>
+  </div>
+
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      // Fetch data from the first API and populate the table
+      fetch('http://127.0.0.1:5000/get_all_users')
+        .then(response => response.json())
+        .then(data => {
+          const userTableBody = document.querySelector('#userTable tbody');
+          userTableBody.innerHTML = '';
+
+          data.users_data.forEach(user => {
+            const row = `
+            <tr>
+              <td>${user.register_number}</td>
+              <td>${user.name}</td>
+              <td>${user.work}</td>
+              <td id="status_${user.register_number}">Pending</td>
+              <td id="isDuplicateHappend${user.register_number}">-</td>
+              <td>
+                <button class="download-button" id="downloadBtn_${user.register_number}" onclick="downloadWork(${user.register_number})">Download</button>
+              </td>
+            </tr>
+          `;
+            userTableBody.innerHTML += row;
+
+            // Fetch data from the second API and update the table cells
+            fetch(`http://127.0.0.1:5000/check_upload_status?register_number=${user.register_number}`)
+              .then(response => response.json())
+              .then(uploadStatus => {
+                const statusCell = document.getElementById(`status_${user.register_number}`);
+                const downloadBtn = document.getElementById(`downloadBtn_${user.register_number}`);
+                const isDuplicateHappendCell = document.getElementById(`isDuplicateHappend${user.register_number}`);
+
+                console.log("ssd", uploadStatus)
+
+                if (uploadStatus.status) {
+                  console.log('adwaith');
+                  statusCell.textContent = 'Completed';
+                  downloadBtn.style.display = 'inline-block'; // Show the download button
+                } else {
+                  statusCell.textContent = 'Not Uploaded';
+                  downloadBtn.style.display = 'none'; // Hide the download button
+                }
+
+                isDuplicateHappendCell.textContent = uploadStatus.uploaded_data.isDuplicateHappend ? "Yes" : "No";
+
+                console.log('adwaith');
+              })
+              .catch(error => console.error('Error fetching upload status:', error));
+          });
+        })
+        .catch(error => console.error('Error fetching data:', error));
+    });
+
+    function showContent(contentId) {
+      const contentElements = document.querySelectorAll('.content > div');
+      contentElements.forEach(element => {
+        element.style.display = 'none';
+      });
+
+      const selectedContent = document.getElementById(contentId);
+      selectedContent.style.display = 'flex';
+    }
+
+    async function downloadWork(registerNumber) {
+      try {
+        // Make a GET request to the server endpoint for downloading data
+        const response = await fetch(`http://127.0.0.1:5000/download_data?register_number=${registerNumber}`);
+
+        // Check if the request was successful (status code 200)
+        if (response.ok) {
+          // Parse the JSON response
+          const data = await response.json();
+
+          // Check if the response contains the download URLs
+          if (data && data.data_urls && data.data_urls.length > 0) {
+            // Loop through the data URLs and initiate the download for each
+            data.data_urls.forEach((dataUrl, index) => {
+              // Create a temporary link
+              const downloadLink = document.createElement('a');
+              downloadLink.href = dataUrl;
+              downloadLink.download = `work_${registerNumber}_${index + 1}.pdf`; // You can customize the file name
+
+              // Append the link to the body
+              document.body.appendChild(downloadLink);
+
+              // Trigger a click event to start the download
+              downloadLink.click();
+
+              // Remove the link from the body
+              document.body.removeChild(downloadLink);
+            });
+          } else {
+            console.error("Download URLs not found in the response");
+          }
+        } else {
+          // Handle non-successful response
+          console.error(`Failed to download work. Status: ${response.status}`);
+        }
+      } catch (error) {
+        console.error("An error occurred during the download:", error);
+      }
+    }
+
+
+    function showDashboardPopup(registerNumber) {
+      // Implement displaying the dashboard popup for the selected student
+      console.log('Showing dashboard for Registration Number:', registerNumber);
+
+      const dashboardPopup = document.getElementById('dashboard-popup');
+      dashboardPopup.style.display = 'block';
+    }
+
+    function closeDashboardPopup() {
+      const dashboardPopup = document.getElementById('dashboard-popup');
+      dashboardPopup.style.display = 'none';
+    }
+  </script>
+
+
+</body>
+
+</html>

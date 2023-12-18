@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Assign Work</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Arial', sans-serif;
+    }
+
+    .arrow {
+      border: solid black;
+      border-width: 0 3px 3px 0;
+      display: inline-block;
+      padding: 3px;
+    }
+
+    .right {
+      transform: rotate(-45deg);
+      -webkit-transform: rotate(-45deg);
+    }
+
+    h2 {
+      text-align: center;
+      color: #333;
+    }
+
+    table {
+      border-collapse: collapse;
+      width: 80%;
+      margin: 20px auto;
+      background-color: #fff;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      border-radius: 8px;
+      overflow: hidden;
+      text-align: center;
+    }
+
+    th,
+    td {
+      border: 1px solid #ddd;
+      padding: 12px;
+
+    }
+
+    th {
+      background-color: #072f60;
+      color: #fff;
+    }
+
+    td input {
+      transform: scale(1.5);
+    }
+
+    .arrow-button {
+      background-color: #17273b;
+      color: #fff;
+      padding: 15px;
+      border: none;
+      border-radius: 50%;
+      cursor: pointer;
+      font-size: 18px;
+      transition: background-color 0.3s;
+      position: fixed;
+      top: 50%;
+      right: 10px;
+      transform: translateY(-50%);
+      z-index: 3;
+    }
+
+    .arrow-button:hover {
+      background-color: #072f60;
+    }
+
+    #overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 1;
+    }
+
+
+    #popup {
+      display: none;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 70%;
+      /* Adjust the width to make it larger */
+      max-width: 400px;
+      /* Set a maximum width if needed */
+      padding: 20px;
+      background-color: #fff;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      z-index: 2;
+      border-radius: 8px;
+    }
+
+    #popup label {
+      margin-bottom: 8px;
+      display: block;
+    }
+
+    #popup input,
+    #popup textarea {
+      width: 100%;
+      box-sizing: border-box;
+      margin-bottom: 16px;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+    }
+
+    #popup button {
+      display: inline-block;
+      background-color: #dbae1a;
+      color: #fff;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      margin-right: 10px;
+      font-size: 16px;
+      transition: background-color 0.3s;
+    }
+
+    #popup button:hover {
+      background-color: #072f60;
+    }
+
+    #close {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      font-size: 24px;
+      color: #888;
+      cursor: pointer;
+    }
+
+    .select-all {
+      transform: scale(1.5);
+    }
+  </style>
+</head>
+
+<body>
+  <table id="studentTable">
+    <thead>
+      <tr>
+        <th><input type="checkbox" class="select-all" onchange="selectAll(this)"></th>
+        <th>Student ID</th>
+        <th>Name</th>
+      </tr>
+    </thead>
+    <tbody id="tableBody">
+      <!-- Data will be dynamically populated here -->
+    </tbody>
+  </table>
+
+  <button class="arrow-button" onclick="openPopup()">
+    <i class="arrow right"></i>
+  </button>
+
+  <div id="overlay"></div>
+  <div id="popup">
+    <span id="close" onclick="clearPopup()">&times;</span>
+    <label for="workNumber">Work Number:</label>
+    <input type="text" id="workNumber" placeholder="Enter work number">
+    <br>
+    <label for="workDetails">Work Details:</label>
+    <textarea id="workDetails" rows="4" placeholder="Enter work details"></textarea>
+    <br>
+    <button onclick="assignWork()">Assign</button>
+    <button onclick="clearPopup()">Clear</button>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      // Function to fetch data from the Flask API and update the table
+      function fetchAndDisplayData() {
+        fetch('http://127.0.0.1:5000/get_all_users')  // Replace with your API endpoint
+          .then(response => response.json())
+          .then(data => {
+            const tableBody = document.getElementById('tableBody');
+            tableBody.innerHTML = '';  // Clear existing table content
+
+            data.users_data.forEach(user => {
+              const newRow = document.createElement('tr');
+              newRow.innerHTML = `
+                  <td><input type="checkbox" class="select-individual"></td>
+                  <td>${user.register_number}</td>
+                  <td>${user.name}</td>
+                `;
+              tableBody.appendChild(newRow);
+            });
+          })
+          .catch(error => console.error('Error fetching data:', error));
+      }
+
+      // Initial data fetch when the page loads
+      fetchAndDisplayData();
+    });
+
+    function selectAll(checkbox) {
+      const checkboxes = document.querySelectorAll('.select-individual');
+      checkboxes.forEach(cb => {
+        cb.checked = checkbox.checked;
+      });
+    }
+
+    function openPopup() {
+      const checkboxes = document.querySelectorAll('.select-individual:checked');
+      if (checkboxes.length > 0) {
+        const overlay = document.getElementById('overlay');
+        const popup = document.getElementById('popup');
+
+        overlay.style.display = 'block';
+        popup.style.display = 'block';
+      } else {
+        alert('Please select at least one student.');
+      }
+    }
+
+    function clearPopup() {
+      const overlay = document.getElementById('overlay');
+      const popup = document.getElementById('popup');
+      const workNumberInput = document.getElementById('workNumber');
+      const textarea = document.getElementById('workDetails');
+
+      overlay.style.display = 'none';
+      popup.style.display = 'none';
+      workNumberInput.value = '';
+      textarea.value = '';
+    }
+
+    function assignWork() {
+      const overlay = document.getElementById('overlay');
+      const popup = document.getElementById('popup');
+      const workNumberInput = document.getElementById('workNumber');
+      const textarea = document.getElementById('workDetails');
+
+      const checkboxes = document.querySelectorAll('.select-individual:checked');
+      if (checkboxes.length === 0) {
+        alert('Please select at least one student.');
+        return;
+      }
+
+      // Get the work number and work details from the input fields
+      const workNumber = workNumberInput.value;
+      const workDetails = textarea.value;
+
+      // Get the register numbers of selected students
+      const registerNumbers = Array.from(checkboxes).map(checkbox => {
+        const row = checkbox.closest('tr');
+        return row.querySelector('td:nth-child(2)').innerText; // Assuming the register number is in the second column
+      });
+
+      // Make an API request to assign work to selected students
+      fetch('http://127.0.0.1:5000/assign_work', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          work_number: workNumber,
+          register_numbers: registerNumbers,
+          work_details: workDetails,
+        }),
+      })
+        .then(response => response.json())
+        .then(data => {
+          // Handle the API response as needed
+          if (data.errors) {
+            alert(`Error assigning work:\n${data.errors.join('\n')}`);
+          } else if (data.success) {
+            alert(`Success:\n${data.success.join('\n')}`);
+          }
+
+          // Close the popup
+          overlay.style.display = 'none';
+          popup.style.display = 'none';
+          workNumberInput.value = '';
+          textarea.value = '';
+        })
+        .catch(error => {
+          console.error('Error assigning work:', error);
+          alert('Error assigning work. Please try again.');
+        });
+    }
+  </script>
+</body>
+
+</html>
