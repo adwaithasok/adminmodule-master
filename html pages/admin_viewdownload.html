@@ -242,22 +242,11 @@
 
           // Check if the response contains the download URLs
           if (data && data.data_urls && data.data_urls.length > 0) {
-            // Loop through the data URLs and initiate the download for each
-            data.data_urls.forEach((dataUrl, index) => {
-              // Create a temporary link
-              const downloadLink = document.createElement('a');
-              downloadLink.href = dataUrl;
-              downloadLink.download = `work_${registerNumber}_${index + 1}.pdf`; // You can customize the file name
+            // Assuming there is only one PDF URL, you can customize as needed
+            const pdfUrl = data.data_urls[0];
 
-              // Append the link to the body
-              document.body.appendChild(downloadLink);
-
-              // Trigger a click event to start the download
-              downloadLink.click();
-
-              // Remove the link from the body
-              document.body.removeChild(downloadLink);
-            });
+            // Open the PDF URL in a new browser tab or window
+            window.open(pdfUrl, '_blank');
           } else {
             console.error("Download URLs not found in the response");
           }
@@ -269,6 +258,8 @@
         console.error("An error occurred during the download:", error);
       }
     }
+
+
 
 
     function showDashboardPopup(registerNumber) {

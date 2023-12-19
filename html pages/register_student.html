@@ -116,6 +116,12 @@
                     alert('Error occurred. Please try again.');
                 });
         }
+        function setMaxDate() {
+            document.getElementById('date_of_birth').max = '2005-12-31';
+        }
+
+        // Call setMaxDate when the document is ready
+        document.addEventListener('DOMContentLoaded', setMaxDate);
     </script>
 
 

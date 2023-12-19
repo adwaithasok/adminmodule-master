@@ -297,6 +297,7 @@
       .then(response => response.json())
       .then(data => populateTable(data.users_data)) // Access the 'users_data' property
       .catch(error => console.error('Error fetching data:', error));
+    let serialNumberCounter = 1;
 
     function populateTable(usersData) {
       // Get the table body element
@@ -311,7 +312,7 @@
         usersData.forEach(user => {
           const row = document.createElement('tr');
           row.innerHTML = `
-          <td>.</td>
+          <td>${serialNumberCounter++}</td>
           <td>${user.name}</td>
           <td>${user.register_number}</td>
           <td>${user.dob}</td>
